@@ -38,7 +38,7 @@ def get_top_from(subreddit, post_limit):
     top_posts = subred.top(limit=post_limit)
 
     post_list = []
-    for post in top_posts:
+    for post in tqdm.tqdm(top_posts):
         # Posts
 
         # Wenn es keinen Flair gibt, dann wird "[none]" übergeben
@@ -48,10 +48,10 @@ def get_top_from(subreddit, post_limit):
             flair = "[none]"
 
         # Wenn der Autor nicht mehr existiert, dann wird "[unknown]" übergeben
+        author_name = "[unknown]"
         if post.author is not None:
-            author_name = post.author.name
-        else:
-            author_name = "[unknown]"
+            if not getattr(post.author, "is_suspended", False):
+                author_name = post.author.name
 
         # Wenn es sich beim Content um ein Bild handelt, wird dessen URL übergeben
         if post.is_self:
@@ -81,6 +81,7 @@ def write_in_csv(path, post_list):
     :param post_list: Die Liste der Posts
     :return: None
     """
+    print(f"\r{len(post_list)} Dictionarys werden in {path} geschrieben", flush=True)
     with open(path, 'w', newline='', encoding="utf-8") as csvfile:
         fieldnames = post_list[0].keys()
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -93,14 +94,8 @@ def write_in_csv(path, post_list):
 # Führt die Funktionen aus
 
 top = get_top_from("de", 100)
-
-user_data = []
-for post in tqdm.tqdm(top):
-    if post["author"] != "[unknown]":
-        user_data.append(get_user_from_name(post["author"]))
-
-print(user_data)
-print(f"Das Post-Dictionary: {top}")
-print(f"Die Anzahl der erhaltenen Posts: {len(top)}")
-
 write_in_csv("../data/postdata.csv", top)
+
+user_data = [get_user_from_name(post["author"]) for post in tqdm.tqdm(top) if post["author"] != "[unknown]"]
+
+write_in_csv("../data/userdata.csv", user_data)
