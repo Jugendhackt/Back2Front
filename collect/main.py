@@ -1,15 +1,30 @@
 import praw
 import csv
 import os
+import tqdm
 
 # Erstelle eine Verbingung über den User JugendHackt_Reddit mit der Anwendung JugendHacktReddit
-user = praw.Reddit(
+reddit = praw.Reddit(
     client_id=os.environ.get("CLIENT_ID"),
     client_secret=os.environ.get("CLIENT_SECRET"),
     user_agent="JugendHacktReddit",
     username="JugendHackt_Reddit",
     password=os.environ.get("REDDIT_PASSWORD")
 )
+
+
+def get_user_from_name(name):
+    user = reddit.redditor(name)
+
+    user_dict = {
+        "name": user.name,
+        "comment_karma": user.comment_karma,
+        "link_karma": user.link_karma,
+        "is_gold": user.is_gold,
+        "created_utc": user.created_utc
+    }
+
+    return user_dict
 
 
 def get_top_from(subreddit, post_limit):
@@ -19,11 +34,13 @@ def get_top_from(subreddit, post_limit):
     :param post_limit: Das Post-Limit
     :return: Die Dictionary-Liste der Posts
     """
-    subred = user.subreddit(subreddit)
+    subred = reddit.subreddit(subreddit)
     top_posts = subred.top(limit=post_limit)
 
     post_list = []
     for post in top_posts:
+        # Posts
+
         # Wenn es keinen Flair gibt, dann wird "[none]" übergeben
         if post.link_flair_text is not None:
             flair = post.link_flair_text
@@ -77,6 +94,12 @@ def write_in_csv(path, post_list):
 
 top = get_top_from("de", 100)
 
+user_data = []
+for post in tqdm.tqdm(top):
+    if post["author"] != "[unknown]":
+        user_data.append(get_user_from_name(post["author"]))
+
+print(user_data)
 print(f"Das Post-Dictionary: {top}")
 print(f"Die Anzahl der erhaltenen Posts: {len(top)}")
 
