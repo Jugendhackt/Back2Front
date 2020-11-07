@@ -93,7 +93,7 @@ def write_in_csv(path, post_list):
 
 # Führt die Funktionen aus
 
-top = get_top_from("de", 100)
+top = get_top_from("de", 997)
 write_in_csv("../data/postdata.csv", top)
 
 user_data = [get_user_from_name(post["author"]) for post in tqdm.tqdm(top) if post["author"] != "[unknown]"]
