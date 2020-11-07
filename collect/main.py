@@ -34,7 +34,7 @@ for post in top_posts:
 
     # Wenn es sich beim Content um ein Bild handelt, wird dessen URL übergeben
     if post.is_self:
-        content = post.selftext
+        content = post.selftext.replace("\n", "\\n")
     else:
         content = post.url
 
@@ -55,13 +55,14 @@ for post in top_posts:
 
 
 print(post_list)
+print(len(post_list))
 
-"""
-with open('postdata.csv', 'w', newline='', encoding="utf-8") as csvfile:
+
+with open('../data/postdata.csv', 'w', newline='', encoding="utf-8") as csvfile:
     fieldnames = post_list[0].keys()
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
 
     writer.writeheader()
     for post_data in post_list:
         writer.writerow(post_data)
-"""
+
