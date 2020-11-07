@@ -1,8 +1,5 @@
-
-
 import praw
 import csv
-
 
 user = praw.Reddit(
     client_id="O52kntr4n-4zYQ",
@@ -15,11 +12,9 @@ user = praw.Reddit(
 subred = user.subreddit("de")
 top_posts = subred.top(limit=100)
 
-
 post_list = []
 
 for post in top_posts:
-
     # Wenn es keinen Flair gibt, dann wird "[none]" übergeben
     if post.link_flair_text is not None:
         flair = post.link_flair_text
@@ -38,7 +33,6 @@ for post in top_posts:
     else:
         content = post.url
 
-
     # Übergibt die Werte in ein Dictionary
     post_dict = {
         "title": post.title,
@@ -50,14 +44,12 @@ for post in top_posts:
         "ratio": post.upvote_ratio,
         "award_count": len(post.awarders)
     }
-
     post_list.append(post_dict)
 
+print("Das Post-Dictionary: " + post_list)
+print("Die Anzahl der erhaltenen Posts: " + len(post_list))
 
-print(post_list)
-print(len(post_list))
-
-
+# Schreibt die post-dictionaries in ein .csv-File
 with open('../data/postdata.csv', 'w', newline='', encoding="utf-8") as csvfile:
     fieldnames = post_list[0].keys()
     writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
@@ -65,4 +57,3 @@ with open('../data/postdata.csv', 'w', newline='', encoding="utf-8") as csvfile:
     writer.writeheader()
     for post_data in post_list:
         writer.writerow(post_data)
-
