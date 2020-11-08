@@ -14,6 +14,11 @@ reddit = praw.Reddit(
 
 
 def get_posts_from_name(name):
+    """
+    Sammelt alle Postdaten vom User mit dem Namen name
+    :param name: Username des Users zum auslesen
+    :return: Post-Dictionary mit Posts des Users
+    """
     user = reddit.redditor(name)
     post_list = []
 
