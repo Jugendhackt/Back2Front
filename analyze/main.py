@@ -1,4 +1,5 @@
 import pandas as pd
+import matplotlib.pyplot as plt
 
 myfile = "../data/postdata.csv"
 
@@ -19,9 +20,43 @@ def convertdates(data):
 	return(data)
 
 
-
 stuff = pd.read_csv(myfile)
+stuff = convertdates(stuff)
 
+def plotdates(stuff):
+
+	groupdata = stuff["flair"].groupby(stuff["created_utc"].dt.hour).count()
+	index = [i for i in range(0,24)]
+	groupdata.reindex(index).plot(kind="bar")
+	plt.xlabel("Uhrzeit")
+	plt.ylabel("Anzahl Posts")
+	plt.title("Anzahl Posts in Abhängigkeit von der Uhrzeit")
+	plt.show()
+
+def flairplot(data):
+	data["score"].groupby(data["flair"]).mean().plot(kind="bar")
+	#data.boxplot(by=data["flair"], column="score")
+	plt.show()
+
+def ratioplot(data):
+	data["score"].groupby(data["ratio"]).mean().plot()
+	plt.show()
+
+def timeplot(stuff):
+	groupdata = stuff["score"].groupby(stuff["created_utc"].dt.hour).mean()
+	index = [i for i in range(0,24)]
+	groupdata.reindex(index).plot(kind="bar")
+	plt.xlabel("Uhrzeit")
+	plt.ylabel("Avg. Score")
+	plt.show()
+	
+	
+#
 #print(str(sortbycontroversial(stuff)) + "\naveragescore: " + str(averagescore(stuff)) + "\n" + str(flairpercentage(stuff)))
 
-print(convertdates(stuff)["created_utc"])
+
+timeplot(stuff)
+#plotdates(stuff)
+#print(ratioplot(stuff))
+#print(stuff["created_utc"])
+
