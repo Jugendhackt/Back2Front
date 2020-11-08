@@ -13,6 +13,37 @@ reddit = praw.Reddit(
 )
 
 
+def get_posts_from_name(name):
+    user = reddit.redditor(name)
+    post_list = []
+
+    posts = user.submissions.new(limit=997)
+    for post in tqdm.tqdm(posts):
+        if post.is_self:
+            content = post.selftext.replace("\n", "\\n")
+        else:
+            content = post.url
+
+        if post.link_flair_text is not None:
+            flair = post.link_flair_text
+        else:
+            flair = "[none]"
+
+        post_dict = {
+            "title": post.title,
+            "flair": flair,
+            "author": "SmallLebowsky",
+            "created_utc": post.created_utc,
+            "content": content,
+            "score": post.score,
+            "ratio": post.upvote_ratio,
+            "award_count": len(post.awarders)
+        }
+        post_list.append(post_dict)
+
+    return post_list
+
+
 def get_user_from_name(name):
     """
     Gibt ein Dictionary mit den Daten des Users mit dem namen name zurück
@@ -98,9 +129,13 @@ def write_in_csv(path, post_list):
 
 # Führt die Funktionen aus
 
-top = get_top_from("de", 100)
-write_in_csv("../data/postdata.csv", top)
+#top = get_top_from("de", 100)
+#write_in_csv("../data/postdata.csv", top)
 
-user_data = [get_user_from_name(post["author"]) for post in tqdm.tqdm(top) if post["author"] != "[unknown]"]
+#user_data = [get_user_from_name(post["author"]) for post in tqdm.tqdm(top) if post["author"] != "[unknown]"]
 
-write_in_csv("../data/userdata.csv", user_data)
+#write_in_csv("../data/userdata.csv", user_data)
+
+lebowsky_data = get_posts_from_name("SmallLebowsky")
+print(len(lebowsky_data))
+write_in_csv("../data/LebowskyData.csv", lebowsky_data)
